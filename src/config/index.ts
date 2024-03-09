@@ -35,6 +35,11 @@ const config = {
   ],
   testUser: process.env.TEST_USER || '',
   testPassword: process.env.TEST_PASWORD || '',
+  registry: {
+    url: 'http://localhost:8008/register',
+    version: '*'
+  },
+
 };
 
 export default config;

@@ -19,6 +19,17 @@
       "args": ["--runInBand"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
-    }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Registry Service",
+      "runtimeArgs": ["-r", "@babel/register"],
+      "program": "${workspaceFolder}/microservices/registry-service/index.js",
+      "cwd": "${workspaceFolder}/microservices/registry-service",
+      "env": {
+        "NODE_PATH": "${workspaceFolder}/microservices/registry-service/node_modules"
+      }
+   }
   ]
 }

@@ -21,6 +21,7 @@ import fs from 'fs';
 import path from 'path';
 import { ErrorHandlerMiddleware } from './middlewares/ErrorHandlerMiddleware';
 import { NotFoundMiddleware } from './middlewares/NotFoundMiddleware';
+import { ProductController } from './controllers/ProductController';
 
 export class API {
   static server: https.Server;
@@ -31,7 +32,7 @@ export class API {
     useContainer(Container);
     const app = createExpressServer({
       cors: true,
-      controllers: [AuthController, UserController, GithubController],
+      controllers: [AuthController, UserController, GithubController, ProductController],
       middlewares: [RequestLogMiddleware, SecurityMiddleware, RateLimitingMiddleware, ErrorHandlerMiddleware, NotFoundMiddleware],
       routePrefix: '/api',
       validation: {
