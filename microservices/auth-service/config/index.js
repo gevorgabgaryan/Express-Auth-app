@@ -10,8 +10,13 @@ const Config = {
   },
   serviceName: pkg.name,
   serviceVersion: pkg.version,
-  JWTSecret: 'secret'
-
+  userRoles: ['user', 'admin', 'editor'],
+  userStatuses: ['new', 'active', 'inactive'],
+  mail: {
+    email: process.env.MAIL_EMAIL,
+    password: process.env.MAIL_PASSWORD,
+  },
+  JWTSecret: 'secret',
 }
 
 export default Config

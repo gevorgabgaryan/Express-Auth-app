@@ -30,6 +30,17 @@
       "env": {
         "NODE_PATH": "${workspaceFolder}/microservices/registry-service/node_modules"
       }
-   }
+   },
+   {
+    "type": "node",
+    "request": "launch",
+    "name": "Catalog Service",
+    "runtimeArgs": ["-r", "@babel/register"],
+    "program": "${workspaceFolder}/microservices/catalog-service/index.js",
+    "cwd": "${workspaceFolder}/microservices/catalog-service",
+    "env": {
+      "NODE_PATH": "${workspaceFolder}/microservices/catalog-service/node_modules"
+    }
+ }
   ]
 }

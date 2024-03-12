@@ -1,13 +1,17 @@
-import MongooseService from './databases/MongooseService'
-import logger from './shared/logger'
-import API from './API/API'
+import Tracing from './lib/tracing';
+import Config from './config';
 
 (async () => {
-  try {
-    await MongooseService.init()
-    await API.init()
-  } catch (e) {
-    logger.error(e)
-  }
-})()
+    await Tracing(`${Config.serviceName}:${Config.serviceVersion}`);
+    const MongooseService = (await import('./databases/MongooseService')).default;
+    const logger = (await import('./shared/logger')).default;
+    const API = (await import('./API/API')).default;
 
+    try {
+        await MongooseService.init();
+        const apiServer = await API.init();
+    } catch (e) {
+        console.error(e);
+        logger.error(e);
+    }
+})();

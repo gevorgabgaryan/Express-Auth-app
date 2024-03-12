@@ -1,5 +1,5 @@
 import { config as dotenvConfig } from 'dotenv';
-import path from 'path';
+import pkg from "../../package.json";
 
 dotenvConfig();
 
@@ -39,6 +39,8 @@ const config = {
     url: 'http://localhost:8008/register',
     version: '*'
   },
+  serviceName: pkg.name,
+  serviceVersion: pkg.version,
 
 };
 

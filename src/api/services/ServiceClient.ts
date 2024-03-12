@@ -29,6 +29,7 @@ class ServiceClient {
       const response = await axios(requestOptions);
       return response.data;
     } catch (e: any) {
+      console.log(e)
       const message = (e.response && e.response.data && e.response.data.message) || e.message;
       logger.error(message);
       throw new  BaseError(404, 'SERVICE_NOT_FOUND');

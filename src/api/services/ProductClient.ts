@@ -49,4 +49,19 @@ export class ProductClient extends BaseService {
     }
   }
 
+  public async add(authorizationHeader: string, productData: any) {
+    try {
+      const result = await this.serviceClient.callService('catalog-service', {
+        method: 'post',
+        url: '/product/add',
+        data: productData,
+        headers: { Authorization: authorizationHeader }
+      });
+      return result;
+    } catch (error: any) {
+      logger.error(error);
+      throw error;
+    }
+  }
+
 }

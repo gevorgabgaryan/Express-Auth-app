@@ -1,7 +1,10 @@
+import 'reflect-metadata';
+import Tracing from './lib/tracing';
+import config from './config';
+Tracing(`${config.serviceName}:${config.serviceVersion}`);
 import Container from 'typedi';
 import { API } from './api';
 import { TypeORM } from './db';
-import logger from './lib/logger';
 import SocketIO from './SocketIO';
 import { WebSocketService } from './websocket';
 
@@ -13,6 +16,6 @@ import { WebSocketService } from './websocket';
     await webSocketService.init();
     await SocketIO.init(httpServer);
   } catch (e) {
-    logger.error(e);
+    console.log(e);
   }
 })();

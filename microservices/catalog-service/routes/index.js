@@ -6,16 +6,20 @@ import {
   validateEditProduct
 } from '../middlewares/validation'
 import ProductController from '../controllers/ProductController'
+import { checkAuthorization } from '../middlewares/checkAuthorization'
 
 const productRoutes = Router()
 
 productRoutes.get('/', validateGetProducts, ProductController.all)
 productRoutes.get('/get/:id', validateParamsObjectId, ProductController.one)
+
 productRoutes.post(
   '/add',
   validateAddProduct,
+  checkAuthorization(),
   ProductController.add
 )
+
 productRoutes.put(
   '/edit/:id',
   validateEditProduct,
@@ -25,6 +29,7 @@ productRoutes.put(
 productRoutes.delete(
   '/delete/:id',
   validateParamsObjectId,
+  checkAuthorization(),
   ProductController.delete
 )
 productRoutes.get(
