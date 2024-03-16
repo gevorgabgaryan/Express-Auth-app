@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import AuthService from '../services/authService'
 
 export const checkAuthorization = (roles) => {
   return async (req, res, next) => {
@@ -13,13 +13,12 @@ export const checkAuthorization = (roles) => {
           message: 'unauthorized'
         })
       }
-      const payload = jwt.verify(token, config.JWTSecret)
-      const { userId, role } = payload
-
-      if (role === 'admin') {
-        throw new Error('Access denied')
-      }
-
+      const { userId, role } = await AuthService.checkToken(
+        token.split(' ')[1],
+        roles
+      )
+      req.role = role
+      req.userId = userId
       next()
     } catch (e) {
       console.log(e)

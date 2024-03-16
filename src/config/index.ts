@@ -41,6 +41,11 @@ const config = {
   },
   serviceName: pkg.name,
   serviceVersion: pkg.version,
+  controllers: process.env.CONTROLLERS || 'src/api/controllers/*Controller.ts',
+  middlewares: process.env.MIDDLEWARES || 'src/api/middlewares/*Middleware.ts',
+  messageBroker: {
+    url: process.env.MESSAGE_BROKER_URL || 'amqp://127.0.0.1'
+  }
 
 };
 

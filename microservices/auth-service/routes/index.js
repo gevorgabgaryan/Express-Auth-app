@@ -12,6 +12,8 @@ authRoutes.post('/register', validateRegisterData, AuthController.register)
 
 authRoutes.post('/login', validateLoginData, AuthController.login)
 
+authRoutes.post('/check-token', checkAuthorization(),  AuthController.getUserInfo)
+
 authRoutes.get(
   '/logout',
   checkAuthorization(['admin', 'editor', 'user']),

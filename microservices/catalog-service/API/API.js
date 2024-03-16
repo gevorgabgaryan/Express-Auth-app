@@ -1,4 +1,5 @@
-import express from 'express'
+import express from 'express';
+import axios from 'axios';
 import { createServer } from 'http'
 import Config from '../config'
 import apiRoutes from '../routes'
@@ -9,7 +10,6 @@ import helmet from 'helmet'
 import { responseSender } from '../utils/util'
 import { CustomError } from '../shared/error'
 import { promisifyAPI } from '../middlewares/promisify'
-import axios from 'axios'
 
 class API {
   static async init () {
@@ -36,12 +36,23 @@ class API {
       )
     })
 
-
+    app.use(function (req, res, next) {
+      const info = {
+        url: req.originalUrl,
+        IP: req.headers['x-forwarded-for']
+      }
+      res.promisify(
+        Promise.reject(
+          new CustomError('API not found', 'API_NOT_FOUND', 400, info)
+        )
+      )
+    })
     app.use(function (err, req, res, next) {
       res.promisify(Promise.reject(err))
     })
 
     const server = createServer(app);
+
 
     server.on('listening', () => {
       const addr = server.address()
@@ -53,28 +64,27 @@ class API {
 
 
       const register = async () =>
-      axios.put(`http://127.0.0.1:8008/register/${Config.serviceName}/${Config.serviceVersion}/${addr.port}`)
-        .then(() => logger.info('Successfuly registered'))
-        .catch(e => logger.error(e));
+        axios.put(`http://127.0.0.1:8008/register/${Config.serviceName}/${Config.serviceVersion}/${addr.port}`)
+          .then(() => logger.info('Catalog service successfuly registered'))
+          .catch(e => logger.error(e));
+
+        const unregister = async () =>
+          axios.delete(`http://127.0.0.1:8008/register/${Config.serviceName}/${Config.serviceVersion}/${addr.port}`)
+            .catch(e => logger.error(e))
 
       register();
 
       const interval = setInterval(register, 10000);
 
-      const unregister = async () =>
-        axios.delete(`http://127.0.0.1:8008/register/${Config.serviceName}/${Config.serviceVersion}/${addr.port}`)
-          .catch(e => logger.error(e))
-
-
       let isCleaning = false
       const cleanup = async () => {
-         if (!isCleaning) {
-                clearInterval(interval)
-                await unregister()
-                isCleaning = true
-          }
+        if (!isCleaning) {
+          isCleaning = true
+          clearInterval(interval)
+          await unregister()
+          isCleaning = true
+        }
       }
-
 
       process.on('uncaughtException', async () => {
         await cleanup()
@@ -91,8 +101,7 @@ class API {
         await cleanup()
         process.exit(0)
       })
-
-     });
+     })
 
 
 

@@ -1,0 +1,4 @@
+NODE_ENV=development
+MONGO_DB_URL=mongodb+srv://gevorgabgaryan2024:eXaOnWsHrOKrcqbc@cluster0.i7idy35.mongodb.net
+MONGO_DB_NAME=EXPRESS_APP
+

@@ -5,8 +5,8 @@ import {
   validateParamsObjectId,
   validateEditProduct
 } from '../middlewares/validation'
-import ProductController from '../controllers/ProductController'
-import { checkAuthorization } from '../middlewares/checkAuthorization'
+import ProductController from '../controllers/ProductController';
+import { checkAuthorization } from '../middlewares/checkAuthorization';
 
 const productRoutes = Router()
 
@@ -29,11 +29,12 @@ productRoutes.put(
 productRoutes.delete(
   '/delete/:id',
   validateParamsObjectId,
-  checkAuthorization(),
+
   ProductController.delete
 )
 productRoutes.get(
   '/total-discount',
+
   ProductController.totalDiscount
 )
 

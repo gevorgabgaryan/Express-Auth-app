@@ -65,7 +65,7 @@ class API {
 
       const register = async () =>
         axios.put(`http://127.0.0.1:8008/register/${Config.serviceName}/${Config.serviceVersion}/${addr.port}`)
-          .then(() => logger.info('Successfuly registered'))
+          .then(() => logger.info('Auth service successfuly registered'))
           .catch(e => logger.error(e));
 
         const unregister = async () =>

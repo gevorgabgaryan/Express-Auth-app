@@ -54,7 +54,7 @@ class AuthService {
       },
       config.JWTSecret,
       {
-        expiresIn: '1d'
+        expiresIn: '3h'
       }
     )
 
@@ -65,15 +65,6 @@ class AuthService {
     try {
       const payload = jwt.verify(token, config.JWTSecret)
       const { userId, role } = payload
-      const redisClient = config.redis.client
-      const exists = await redisClient.sismember(
-        `user:${userId}:tokens`,
-        token
-      )
-
-      if (exists !== 1) {
-        throw new Error('Invalid token')
-      }
 
       if (authorizationRoles && !authorizationRoles.includes(role)) {
         throw new Error('Access denied')

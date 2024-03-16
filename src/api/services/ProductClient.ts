@@ -64,4 +64,19 @@ export class ProductClient extends BaseService {
     }
   }
 
+  public async getProduct(id: string) {
+    try{
+        const result = await this.serviceClient.callService('catalog-service', {
+        method: 'get',
+        url: `/product/get/${id}`,
+      })
+      return result;
+
+    } catch (error: any) {
+      logger.error(error);
+      throw error;
+    }
+  }
+
+
 }

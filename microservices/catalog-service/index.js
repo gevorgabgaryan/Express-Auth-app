@@ -15,3 +15,4 @@ import Config from './config';
         logger.error(e);
     }
 })();
+

@@ -43,4 +43,22 @@ export class AuthClient extends BaseService {
     }
   }
 
+  public async checkToken(authorizationHeader : string, roles?: string[]) {
+    try{
+      const result = await this.serviceClient.callService('auth-service', {
+        method: 'post',
+        url: '/auth/check-token',
+        data: {
+          roles
+        },
+        headers: { Authorization: authorizationHeader }
+      })
+      return result;
+
+    } catch (error: any) {
+      logger.error(error);
+      throw error;
+    }
+  }
+
 }

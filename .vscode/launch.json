@@ -41,6 +41,17 @@
     "env": {
       "NODE_PATH": "${workspaceFolder}/microservices/catalog-service/node_modules"
     }
- }
+   },
+   {
+    "type": "node",
+    "request": "launch",
+    "name": "Order Service",
+    "runtimeArgs": ["-r", "@babel/register"],
+    "program": "${workspaceFolder}/microservices/order-service/index.js",
+    "cwd": "${workspaceFolder}/microservices/order-service",
+    "env": {
+      "NODE_PATH": "${workspaceFolder}/microservices/order-service/node_modules"
+    }
+   }
   ]
 }

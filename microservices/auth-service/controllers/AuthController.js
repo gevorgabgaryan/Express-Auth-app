@@ -42,6 +42,22 @@ class AuthController {
     }
   }
 
+  static async getUserInfo(req, res) {
+    try {
+      res.status(200).json({
+          userId: req.userId,
+          role: req.role
+      })
+    } catch (e) {
+      console.log(e)
+      res.status(400).json({
+        status: false,
+        error: true,
+        message: 'System error'
+      })
+    }
+  }
+
   static async logout (req, res) {
     try {
       const token = req.headers.Authorization

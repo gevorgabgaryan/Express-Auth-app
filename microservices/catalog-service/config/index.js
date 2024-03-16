@@ -10,8 +10,6 @@ const Config = {
   },
   serviceName: pkg.name,
   serviceVersion: pkg.version,
-  JWTSecret: 'secret'
-
 }
 
 export default Config

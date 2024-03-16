@@ -10,7 +10,7 @@ class ServiceClient {
 
  static async getService(servicename: string): Promise<any> {
     try {
-      const res = await axios.get(`${config.registry.url}/find/${servicename}/${config.registry.version}`);
+      const res = await axios.get(`${config.registry.url}/find/${servicename}/${config.registry.version}`, {timeout: 30000});
       if (!res.data.result || !res.data.result.ip) {
         throw new BaseError(404, 'SERVICE_NOT_FOUND',`Service ${servicename} not found`, 'SERVICE_NOT_FOUND');
       }
@@ -26,7 +26,7 @@ class ServiceClient {
     const { ip, port } = await ServiceClient.getService(servicename);
     requestOptions.url = `http://${ip}:${port}${requestOptions.url}`;
     try {
-      const response = await axios(requestOptions);
+      const response = await axios({...requestOptions,  timeout: 30000});
       return response.data;
     } catch (e: any) {
       console.log(e)

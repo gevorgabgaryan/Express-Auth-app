@@ -32,8 +32,8 @@ export class API {
     useContainer(Container);
     const app = createExpressServer({
       cors: true,
-      controllers: [AuthController, UserController, GithubController, ProductController],
-      middlewares: [RequestLogMiddleware, SecurityMiddleware, RateLimitingMiddleware, ErrorHandlerMiddleware, NotFoundMiddleware],
+      controllers: [path.join(__dirname, '../../', config.controllers)],
+      middlewares: [path.join(__dirname, '../../', config.middlewares)],
       routePrefix: '/api',
       validation: {
         whitelist: true,

@@ -23,3 +23,8 @@ LOG_OUTPUT=tiny
 
 TEST_USER=Your_email
 TEST_PASWORD=Your_password
+
+CONTROLLERS=src/api/controllers/*Controller.ts
+MIDDLEWARES=src/api/middlewares/*Middleware.ts
+
+MESSAGE_BROKER_URL=amqp://127.0.0.1
