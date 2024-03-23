@@ -8,7 +8,7 @@ import { Service } from 'typedi';
 export class RateLimitingMiddleware implements ExpressMiddlewareInterface {
   private limiter = RateLimit({
     windowMs: 60 * 1000,
-    max: 5000,
+    max: 50000000,
   });
 
   public use(req: express.Request, res: express.Response, next: express.NextFunction): any {

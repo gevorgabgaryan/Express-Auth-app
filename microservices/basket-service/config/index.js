@@ -14,7 +14,8 @@ const Config = {
     port: process.env.REDIS_PORT || 6379,
     client: null
   },
-  JWTSecret: 'secret'
+  JWTSecret: 'secret',
+
 }
 
 export default Config

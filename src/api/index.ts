@@ -14,14 +14,8 @@ import { GithubController } from './controllers/GithubController';
 import http from 'http';
 import express from 'express';
 import logger from '../lib/logger';
-import { RequestLogMiddleware } from './middlewares/RequestLogMiddleware';
-import { SecurityMiddleware } from './middlewares/SecurityMiddleware';
-import { RateLimitingMiddleware } from './middlewares/RateLimitingMiddleware';
-import fs from 'fs';
 import path from 'path';
-import { ErrorHandlerMiddleware } from './middlewares/ErrorHandlerMiddleware';
-import { NotFoundMiddleware } from './middlewares/NotFoundMiddleware';
-import { ProductController } from './controllers/ProductController';
+
 
 export class API {
   static server: http.Server;

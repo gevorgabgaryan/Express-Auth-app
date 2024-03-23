@@ -20,6 +20,7 @@ import { UserExistsError } from '../errors/UserExistsError';
 import { ProductQuery } from '../controllers/requests/product/ProductQuery';
 import logger from '../../lib/logger';
 import ServiceClient from './ServiceClient';
+import Redis from 'ioredis';
 
 
 
@@ -33,7 +34,20 @@ export class ProductClient extends BaseService {
 
   public async all(query: ProductQuery) {
     try{
+
+      const redisClient: Redis | null = config.redis.client;
+
       const {page, itemsPerPage, keyword} =  query;
+
+      const cacheKey = `getProducts:${page}:${itemsPerPage}:${keyword}`;
+
+      if (redisClient) {
+        const cacheResult = await redisClient.get(cacheKey);
+        if (cacheResult) {
+          return JSON.parse(cacheResult);
+        }
+      }
+
       const result = await this.serviceClient.callService('catalog-service', {
         method: 'get',
         url: '/product',
@@ -41,6 +55,11 @@ export class ProductClient extends BaseService {
           page, itemsPerPage, keyword
         }
       })
+
+      if (redisClient) {
+        await redisClient.setex(cacheKey, 3600, JSON.stringify(result));
+      }
+
       return result;
 
     } catch (error: any) {
@@ -57,6 +76,9 @@ export class ProductClient extends BaseService {
         data: productData,
         headers: { Authorization: authorizationHeader }
       });
+
+      this.invalidateProductCache();
+
       return result;
     } catch (error: any) {
       logger.error(error);
@@ -70,12 +92,37 @@ export class ProductClient extends BaseService {
         method: 'get',
         url: `/product/get/${id}`,
       })
+
+
+
       return result;
 
     } catch (error: any) {
       logger.error(error);
       throw error;
     }
+  }
+
+  private async invalidateProductCache() {
+    const redisClient: Redis | null = config.redis.client;
+    if (!redisClient) {
+      return;
+    }
+
+    // await redisClient.flushall();
+
+    const cacheKeyPattern = 'getProducts:*';
+
+    let cursor = '0';
+    do {
+      const scanResult = await redisClient.scan(cursor, 'MATCH', cacheKeyPattern, 'COUNT', '100');
+      cursor = scanResult[0];
+      const keys = scanResult[1];
+
+      if (keys.length) {
+        await redisClient.del(keys);
+      }
+    } while (cursor !== '0');
   }
 
 

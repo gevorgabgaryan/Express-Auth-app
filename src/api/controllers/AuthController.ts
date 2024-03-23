@@ -1,6 +1,6 @@
 import { Authorized, Body, CurrentUser, Get, JsonController, OnUndefined, Post, UseBefore } from 'routing-controllers';
 import { Service } from 'typedi';
-import { AuthRateLimitingMiddleware } from '../middlewares/AuthRateLimitingMiddleware';
+import { AuthRateLimitingMiddleware } from './middlewares/AuthRateLimitingMiddleware';
 import { AuthClient } from '../services/AuthClient';
 
 @JsonController('/auth')

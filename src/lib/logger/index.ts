@@ -15,22 +15,7 @@ const logger = createLogger({
       maxFiles: 5,
       filename: 'logs/info.log',
     }),
-    new transports.Console({
-      level: 'error',
-      format: format.combine(
-        format.timestamp({
-          format: 'MMM-DD-YYYY HH:mm:ss',
-        }),
-        format.colorize(),
-        format.printf((info) => {
-          if (info instanceof Error) {
-            // Log error stack trace for error logs
-            return `${info.timestamp} ${info.level}: ${info.message}\n${info.stack}`;
-          }
-          return `${info.timestamp} ${info.level}: ${info.message}`;
-        }),
-      ),
-    }),
+
   ],
   format: format.combine(
     format.timestamp({
