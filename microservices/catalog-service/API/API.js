@@ -10,6 +10,7 @@ import helmet from 'helmet'
 import { responseSender } from '../utils/util'
 import { CustomError } from '../shared/error'
 import { promisifyAPI } from '../middlewares/promisify'
+import ProductService from '../serveces/ProductService';
 
 class API {
   static async init () {
@@ -63,51 +64,42 @@ class API {
       )
 
 
-      const register = async () =>
-        axios.put(`http://127.0.0.1:8008/register/${Config.serviceName}/${Config.serviceVersion}/${addr.port}`)
-          .then(() => logger.info('Catalog service successfuly registered'))
-          .catch(e => logger.error(e));
 
-        const unregister = async () =>
-          axios.delete(`http://127.0.0.1:8008/register/${Config.serviceName}/${Config.serviceVersion}/${addr.port}`)
-            .catch(e => logger.error(e))
 
-      register();
-
-      const interval = setInterval(register, 10000);
-
-      let isCleaning = false
-      const cleanup = async () => {
-        if (!isCleaning) {
-          isCleaning = true
-          clearInterval(interval)
-          await unregister()
-          isCleaning = true
-        }
-      }
-
-      process.on('uncaughtException', async () => {
-        await cleanup()
-        process.exit(0)
-      })
-
-      process.on('SIGTERM', async () => {
-        await cleanup()
-        process.exit(0)
-      })
-
-      process.on('SIGINT', async () => {
-        console.log('SIGINT')
-        await cleanup()
-        process.exit(0)
-      })
      })
 
-
+    API.startConsumer();
 
     server.listen(0);
 
     return server
+  }
+
+  static async startConsumer() {
+    try {
+    const requestQueue = 'product_requests';
+
+    const channel = Config.messageBroker.channel
+    await channel.assertQueue(requestQueue, { durable: false });
+
+    console.log("Waiting for messages in %s. To exit press CTRL+C", requestQueue);
+    channel.consume(requestQueue, async (msg) => {
+      if (msg !== null) {
+        const query = JSON.parse(msg.content.toString());
+        const { page, itemsPerPage, keyword } = query;
+        const products = await ProductService.getProducts(page, itemsPerPage, keyword);
+        console.log('products', products.products.length);
+        if (msg.properties.replyTo) {
+          channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(products)), {
+            correlationId: msg.properties.correlationId,
+          });
+        }
+      }
+    }, { noAck: true });
+    } catch(e) {
+      logger.error(e);
+      throw e
+    }
   }
 }
 

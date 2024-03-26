@@ -1,12 +1,13 @@
 import { Redis } from 'ioredis';
 import config from '../config';
+import logger from '../lib/logger';
 
 class RedisService {
   static async init(): Promise<Redis> {
     // Assuming config.redis.port is a number. Adjust the type if necessary.
-    const redis = new Redis(config.redis.port);
+    const redis = new Redis(config.redis.url);
     redis.on('connect', () => {
-      console.log('connected to Redis');
+      logger.info('connected to Redis');
     });
 
     redis.on('error', (e: Error) => {

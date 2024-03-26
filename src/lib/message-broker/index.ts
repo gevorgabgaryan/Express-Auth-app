@@ -17,6 +17,10 @@ class MessageBroker {
     }
   }
 
+  static getChannel(): Channel | null {
+    return this.channel;
+  }
+
   static async sendMessage(queue: string, message: any): Promise<boolean> {
     if (!this.channel) {
       throw new Error("MessageBroker is not initialized. Call init() first.");

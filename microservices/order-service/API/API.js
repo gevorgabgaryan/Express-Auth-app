@@ -127,9 +127,37 @@ class API {
       )
     })
 
+    API.startConsumer()
     server.listen(0)
 
     return server
+  }
+
+  static async startConsumer() {
+    try {
+    const requestQueue = 'product_requests';
+
+    const channel = Config.messageBroker.channel
+    await channel.assertQueue(requestQueue, { durable: false });
+
+    console.log("Waiting for messages in %s. To exit press CTRL+C", requestQueue);
+    channel.consume(requestQueue, async (msg) => {
+      if (msg !== null) {
+        const query = JSON.parse(msg.content.toString());
+        const { page, itemsPerPage, keyword } = query;
+        const products = await ProductService.getProducts(page, itemsPerPage, keyword);
+        console.log('products', products.products.length);
+        if (msg.properties.replyTo) {
+          channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(products)), {
+            correlationId: msg.properties.correlationId,
+          });
+        }
+      }
+    }, { noAck: true });
+    } catch(e) {
+      logger.error(e);
+      throw e
+    }
   }
 }
 

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
+    "build": "tsc",
     "dev": "nodemon",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"**/*.{ts,json}\"",
@@ -18,7 +19,8 @@
     "test:unit": "npm run test -- --testPathPattern=unit",
     "test:integration": "npm run test -- --testPathPattern=integration",
     "test:e2e": "npm run test -- --testPathPattern=e2e",
-    "test:coverage": "jest --coverage --runInBand --testPathPattern=unit"
+    "test:coverage": "jest --coverage --runInBand --testPathPattern=unit",
+    "typeorm:prod:run-migrations": "npm run typeorm -- migration:run -d dist/src/db/appDataSource.js"
   },
   "repository": {
     "type": "git",

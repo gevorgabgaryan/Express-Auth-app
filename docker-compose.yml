@@ -1,7 +1,52 @@
-version: '3.8'
+version: '3'
 
 services:
-  db:
+  main:
+    build:
+      context: ./
+    ports:
+      - "4000:3115"
+    env_file:
+      - .env.prod
+    networks:
+      - mynetwork
+  registry:
+    build:
+      context: ./microservices/registry-service
+    env_file:
+      - .env.prod
+    networks:
+      - mynetwork
+  catalog:
+    build:
+      context: ./microservices/catalog-service
+    depends_on:
+      - mongodb
+    env_file:
+      - .env.prod
+    networks:
+      - mynetwork
+
+  order:
+    build:
+      context: ./microservices/order-service
+    depends_on:
+      - postgres
+      - rabbitmq
+    env_file:
+      - .env.prod
+    networks:
+      - mynetwork
+  auth:
+    build:
+      context: ./microservices/auth-service
+    depends_on:
+       - mongodb
+    env_file:
+      - .env.prod
+    networks:
+      - mynetwork
+  postgres:
     image: postgres:16
     restart: always
     environment:
@@ -12,5 +57,33 @@ services:
       - "5532:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+  redis:
+    image: redis:latest
+    networks:
+      - mynetwork
+
+  mongodb:
+    image: mongo:latest
+    env_file:
+      - .env.prod
+    networks:
+      - mynetwork
+
+  rabbitmq:
+    image: rabbitmq:latest
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
 volumes:
   postgres_data:

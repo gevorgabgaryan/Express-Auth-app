@@ -21,6 +21,7 @@ import { ProductQuery } from '../controllers/requests/product/ProductQuery';
 import logger from '../../lib/logger';
 import ServiceClient from './ServiceClient';
 import Redis from 'ioredis';
+import MessageBroker from '../../lib/message-broker';
 
 
 
@@ -32,41 +33,80 @@ export class ProductClient extends BaseService {
     super();
   }
 
-  public async all(query: ProductQuery) {
-    try{
+  public async all(query: ProductQuery): Promise<any> {
+    const queryMessage: Buffer = Buffer.from(JSON.stringify(query));
+    const correlationId: string = uuidv4();
 
-      const redisClient: Redis | null = config.redis.client;
-
-      const {page, itemsPerPage, keyword} =  query;
-
-      const cacheKey = `getProducts:${page}:${itemsPerPage}:${keyword}`;
-
-      if (redisClient) {
-        const cacheResult = await redisClient.get(cacheKey);
-        if (cacheResult) {
-          return JSON.parse(cacheResult);
-        }
-      }
-
-      const result = await this.serviceClient.callService('catalog-service', {
-        method: 'get',
-        url: '/product',
-        params: {
-          page, itemsPerPage, keyword
-        }
-      })
-
-      if (redisClient) {
-        await redisClient.setex(cacheKey, 3600, JSON.stringify(result));
-      }
-
-      return result;
-
-    } catch (error: any) {
-      logger.error(error);
-      throw error;
+    const requestQueue: string = 'product_requests';
+    const channel = MessageBroker.getChannel();
+    if (channel === null) {
+      throw new Error('Channel not found');
     }
+
+    await channel.assertQueue(requestQueue, { durable: false });
+    const { queue: replyQueue } = await channel.assertQueue('', { exclusive: true });
+
+
+    channel.sendToQueue(requestQueue, queryMessage, {
+      correlationId,
+      replyTo: replyQueue,
+    });
+
+    return new Promise((resolve, reject) => {
+      const timeoutHandle: NodeJS.Timeout = setTimeout(() => {
+        channel.deleteQueue(replyQueue);
+        reject(new Error('Operation timed out'));
+      }, 20000);
+
+      channel.consume(replyQueue, (msg: any) => {
+        if (msg !== null && msg.properties.correlationId === correlationId) {
+          clearTimeout(timeoutHandle);
+          channel.deleteQueue(replyQueue);
+          resolve(JSON.parse(msg.content.toString()));
+        }
+      }, { noAck: true });
+    }).catch((error) => {
+      console.error('Error or timeout', error);
+      throw new BadRequestError();
+    });
   }
+
+
+  // public async all(query: ProductQuery) {
+  //   try{
+
+  //     const redisClient: Redis | null = config.redis.client;
+
+  //     const {page, itemsPerPage, keyword} =  query;
+
+  //     const cacheKey = `getProducts:${page}:${itemsPerPage}:${keyword}`;
+
+  //     if (redisClient) {
+  //       const cacheResult = await redisClient.get(cacheKey);
+  //       if (cacheResult) {
+  //         return JSON.parse(cacheResult);
+  //       }
+  //     }
+
+  //     const result = await this.serviceClient.callService('catalog-service', {
+  //       method: 'get',
+  //       url: '/product',
+  //       params: {
+  //         page, itemsPerPage, keyword
+  //       }
+  //     })
+
+  //     if (redisClient) {
+  //       await redisClient.setex(cacheKey, 3600, JSON.stringify(result));
+  //     }
+
+  //     return result;
+
+  //   } catch (error: any) {
+  //     logger.error(error);
+  //     throw error;
+  //   }
+  // }
 
   public async add(authorizationHeader: string, productData: any) {
     try {

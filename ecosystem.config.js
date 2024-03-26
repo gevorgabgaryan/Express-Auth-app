@@ -6,7 +6,7 @@ module.exports = {
       name: "main",
       script: "npm",
       args: "start",
-      instances: 1,
+      instances: 3,
       autorestart: true,
       watch: ["./src"],
       env: {

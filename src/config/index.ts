@@ -1,6 +1,5 @@
 import { config as dotenvConfig } from 'dotenv';
 import Redis from 'ioredis';
-import pkg from "../../package.json";
 
 dotenvConfig();
 
@@ -40,15 +39,15 @@ const config = {
     url: 'http://localhost:8008/register',
     version: '*'
   },
-  serviceName: pkg.name,
-  serviceVersion: pkg.version,
+  serviceName: 'main',
+  serviceVersion: '1',
   controllers: process.env.CONTROLLERS || 'src/api/controllers/*Controller.ts',
   middlewares: process.env.MIDDLEWARES || 'src/api/middlewares/*Middleware.ts',
   messageBroker: {
     url: process.env.MESSAGE_BROKER_URL || 'amqp://127.0.0.1'
   },
   redis: {
-    port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379,
+    url: process.env.REDIS_URL ? process.env.REDIS_URL : 'redis://redis:6379',
     client: null as Redis | null,
   },
 
